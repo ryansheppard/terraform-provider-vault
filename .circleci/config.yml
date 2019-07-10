@@ -49,7 +49,9 @@ jobs:
           mkdir -p $GOPATH/src/github.com/hashicorp
           cd $GOPATH/src/github.com/hashicorp
           git clone git@github.com:hashicorp/vault.git
-          cd vault/scripts
+          cd vault
+          make dev
+          cd scripts
           ./gen_openapi.sh
           cd $GOPATH/src/github.com/terraform-providers/terraform-provider-vault/cmd/coverage
           go build

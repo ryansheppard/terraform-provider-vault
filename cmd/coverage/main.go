@@ -5,17 +5,14 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/hashicorp/vault/logical/framework" // TODO wrong dependency I think? anything without Vault?
 	"io/ioutil"
 	"os"
-	"strings"
+	"sort"
+
+	"github.com/hashicorp/vault/logical/framework"
+	"github.com/terraform-providers/terraform-provider-vault/vault"
 )
 
-// TODO if an endpoint's only method is LIST, omit it from the comparison
-// TODO actually, make this an api endpoint in the plugin? or put a list in the readme or linked there?
-// TODO ensure the paths in the inventory match something in openapi but exclude enterprise endpoints
-// TODO also make sure they're only covered once and have a match?
-// TODO make an exception for GenericPath and UnknownPath
 var pathToOpenAPIDoc = flag.String("openapi-doc", "", "path/to/openapi.json")
 
 // This tool is used for generating a coverage reports regarding
@@ -38,12 +35,70 @@ func main() {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
+	// This is the path, to whether they've been observed in the OpenAPI doc
+	vaultPaths := make(map[string]bool)
 	for path := range oasDoc.Paths {
-		if strings.Contains(path, "pki") && !strings.Contains(path, "auth") && strings.Contains(path, "sign") {
-			fmt.Println(path)
+		vaultPaths[path] = false
+	}
+
+	for _, desc := range vault.DataSourceRegistry {
+		for _, path := range desc.PathInventory {
+			if path == vault.GenericPath || path == vault.UnknownPath {
+				continue
+			}
+			seenBefore, isCurrentlyInVault := vaultPaths[path]
+			if !isCurrentlyInVault && !desc.EnterpriseOnly {
+				fmt.Println(path + " is not currently in Vault")
+			}
+			if seenBefore {
+				fmt.Println(path + " is in the Terraform Vault Provider multiple times")
+			}
+			vaultPaths[path] = true
 		}
 	}
 
-	// Compare
-	// Output
+	for _, desc := range vault.ResourceRegistry {
+		for _, path := range desc.PathInventory {
+			if path == vault.GenericPath || path == vault.UnknownPath {
+				continue
+			}
+			seenBefore, isCurrentlyInVault := vaultPaths[path]
+			if !isCurrentlyInVault && !desc.EnterpriseOnly {
+				fmt.Println(path + " is not currently in Vault")
+			}
+			if seenBefore {
+				fmt.Println(path + " is in the Terraform Vault Provider multiple times")
+			}
+			vaultPaths[path] = true
+		}
+	}
+
+	supportedVaultEndpoints := []string{}
+	unSupportedVaultEndpoints := []string{}
+	for path, seen := range vaultPaths {
+		if seen {
+			supportedVaultEndpoints = append(supportedVaultEndpoints, path)
+		} else {
+			unSupportedVaultEndpoints = append(unSupportedVaultEndpoints, path)
+		}
+	}
+
+	fmt.Println(" ")
+	fmt.Printf("%.0f percent coverage\n", float64(len(supportedVaultEndpoints))/float64(len(vaultPaths))*100)
+	fmt.Printf("%d of %d vault paths are supported\n", len(supportedVaultEndpoints), len(vaultPaths))
+	fmt.Printf("%d of %d vault paths are unsupported\n", len(unSupportedVaultEndpoints), len(vaultPaths))
+
+	fmt.Println(" ")
+	fmt.Println("SUPPORTED")
+	sort.Strings(supportedVaultEndpoints)
+	for _, path := range supportedVaultEndpoints {
+		fmt.Println("    " + path)
+	}
+
+	fmt.Println(" ")
+	fmt.Println("UNSUPPORTED")
+	sort.Strings(unSupportedVaultEndpoints)
+	for _, path := range unSupportedVaultEndpoints {
+		fmt.Println("    " + path)
+	}
 }

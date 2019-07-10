@@ -6,7 +6,7 @@ import (
 )
 
 func Test_Main(t *testing.T) {
-	pathToDoc := "/home/tbex/go/src/github.com/terraform-providers/terraform-provider-vault/testdata/openapi.json"
+	pathToDoc := "../../testdata/openapi.json"
 	if err := flag.Set("openapi-doc", pathToDoc); err != nil {
 		t.Fatal(err)
 	}

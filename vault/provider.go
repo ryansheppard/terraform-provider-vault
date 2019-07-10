@@ -140,7 +140,6 @@ type Description struct {
 	Resource *schema.Resource
 }
 
-// TODO add a tool that lists the path inventory, or even performs a check against Vault so it's super easy
 var (
 	DataSourceRegistry = map[string]*Description{
 		"vault_approle_auth_backend_role_id": {
@@ -303,7 +302,7 @@ var (
 		},
 		"vault_jwt_auth_backend": {
 			Resource:      jwtAuthBackendResource(),
-			PathInventory: []string{},
+			PathInventory: []string{"/auth/jwt/config"},
 		},
 		"vault_jwt_auth_backend_role": {
 			Resource:      jwtAuthBackendRoleResource(),
@@ -346,13 +345,13 @@ var (
 			PathInventory: []string{"/sys/policy/{name}"},
 		},
 		"vault_egp_policy": {
-			Resource:      egpPolicyResource(),
-			PathInventory: []string{"/sys/policies/egp/{name}"},
+			Resource:       egpPolicyResource(),
+			PathInventory:  []string{"/sys/policies/egp/{name}"},
 			EnterpriseOnly: true,
 		},
 		"vault_rgp_policy": {
-			Resource:      rgpPolicyResource(),
-			PathInventory: []string{"/sys/policies/rgp/{name}"},
+			Resource:       rgpPolicyResource(),
+			PathInventory:  []string{"/sys/policies/rgp/{name}"},
 			EnterpriseOnly: true,
 		},
 		"vault_mount": {
@@ -360,8 +359,8 @@ var (
 			PathInventory: []string{"/sys/mounts/{path}"},
 		},
 		"vault_namespace": {
-			Resource:      namespaceResource(),
-			PathInventory: []string{"/sys/namespaces/{path}"},
+			Resource:       namespaceResource(),
+			PathInventory:  []string{"/sys/namespaces/{path}"},
 			EnterpriseOnly: true,
 		},
 		"vault_audit": {
@@ -397,7 +396,7 @@ var (
 			PathInventory: []string{"/identity/lookup/group"},
 		},
 		"vault_rabbitmq_secret_backend": {
-			Resource:      rabbitmqSecretBackendResource(),
+			Resource: rabbitmqSecretBackendResource(),
 			PathInventory: []string{
 				"/rabbitmq/config/connection",
 				"/rabbitmq/config/lease",

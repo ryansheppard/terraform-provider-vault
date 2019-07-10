@@ -134,7 +134,7 @@ type Description struct {
 	//		"/transit/sign/{name}/{urlalgorithm}"
 	PathInventory []string
 
-	// Defaults to false, but should be marked true if a resource is enterprise only.
+	// EnterpriseOnly defaults to false, but should be marked true if a resource is enterprise only.
 	EnterpriseOnly bool
 
 	Resource *schema.Resource

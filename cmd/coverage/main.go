@@ -15,7 +15,7 @@ import (
 
 var pathToOpenAPIDoc = flag.String("openapi-doc", "", "path/to/openapi.json")
 
-// This tool is used for generating a coverage reports regarding
+// This tool is used for generating a coverage report regarding
 // how much of the Vault API can be consumed with the Terraform
 // Vault provider.
 func main() {
@@ -30,17 +30,22 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Read in Vault's description of all the supported endpoints, their methods, and more.
 	oasDoc := &framework.OASDocument{}
 	if err := json.NewDecoder(bytes.NewBuffer(doc)).Decode(oasDoc); err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
-	// This is the path, to whether they've been observed in the OpenAPI doc
+
+	// Gather up all the paths/endpoints available in Vault, and have a bool to represent
+	// whether they've been "seen" yet in this provider.
 	vaultPaths := make(map[string]bool)
 	for path := range oasDoc.Paths {
 		vaultPaths[path] = false
 	}
 
+	// Go through the datasources and mark the paths/endpoints they support,
+	// remarking upon notable observations along the way.
 	for _, desc := range vault.DataSourceRegistry {
 		for _, path := range desc.PathInventory {
 			if path == vault.GenericPath || path == vault.UnknownPath {
@@ -57,6 +62,8 @@ func main() {
 		}
 	}
 
+	// Go through the resources and mark the paths/endpoints they support,
+	// remarking upon notable observations along the way.
 	for _, desc := range vault.ResourceRegistry {
 		for _, path := range desc.PathInventory {
 			if path == vault.GenericPath || path == vault.UnknownPath {
@@ -73,6 +80,7 @@ func main() {
 		}
 	}
 
+	// Separate what's supported from what isn't to make our report more readable.
 	supportedVaultEndpoints := []string{}
 	unSupportedVaultEndpoints := []string{}
 	for path, seen := range vaultPaths {
@@ -83,6 +91,8 @@ func main() {
 		}
 	}
 
+	// Surely this output could be done more gracefully with a template,
+	// but this is quick and very easy to edit or maintain.
 	fmt.Println(" ")
 	fmt.Printf("%.0f percent coverage\n", float64(len(supportedVaultEndpoints))/float64(len(vaultPaths))*100)
 	fmt.Printf("%d of %d vault paths are supported\n", len(supportedVaultEndpoints), len(vaultPaths))

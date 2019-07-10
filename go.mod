@@ -5,6 +5,7 @@ go 1.12
 require (
 	cloud.google.com/go v0.37.4 // indirect
 	github.com/aws/aws-sdk-go v1.19.18
+	github.com/fatih/structs v1.1.0 // indirect
 	github.com/golang/protobuf v1.3.1 // indirect
 	github.com/gosimple/slug v1.4.1
 	github.com/hashicorp/go-cleanhttp v0.5.1

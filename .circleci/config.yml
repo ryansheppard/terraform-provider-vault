@@ -50,6 +50,7 @@ jobs:
           cd $GOPATH/src/github.com/hashicorp
           git clone git@github.com:hashicorp/vault.git
           cd vault
+          make bootstrap
           make dev
           cd scripts
           ./gen_openapi.sh

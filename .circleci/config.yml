@@ -26,6 +26,11 @@ jobs:
           echo 'export VAULT_ADDR="http://localhost:8200"' >> $BASH_ENV
           echo 'export TF_ACC="1"' >> $BASH_ENV
           echo 'GO111MODULE=on' >> $BASH_ENV
+          # the default GOPATH is actually two paths and results in wonky behavior
+          # it starts as /home/circleci/.go_workspace:/usr/local/go_workspace
+          # and we're just going to use the first one
+          echo 'export GOPATH=$(echo $GOPATH | tr ":" "\n" | head -n 1)'
+          echo $GOPATH
           echo 'export GOBIN=$GOPATH/bin' >> $BASH_ENV
           echo 'export PATH=$PATH:$GOPATH/bin'
     - run:
@@ -53,7 +58,7 @@ jobs:
           cd vault
           mkdir -p $GOPATH/bin
           echo $PATH
-          echo $GOPATH
+          echo $GOPATH # /home/circleci/.go_workspace:/usr/local/go_workspace
           make bootstrap
           ls -lagh $GOPATH/bin
           make dev

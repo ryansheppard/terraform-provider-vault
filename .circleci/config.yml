@@ -51,6 +51,7 @@ jobs:
           cd $GOPATH/src/github.com/hashicorp
           git clone git@github.com:hashicorp/vault.git
           cd vault
+          mkdir -p $GOPATH/bin
           echo $PATH
           echo $GOPATH
           make bootstrap

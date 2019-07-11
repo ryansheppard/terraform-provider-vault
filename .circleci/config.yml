@@ -53,8 +53,9 @@ jobs:
           cd vault
           echo $PATH
           echo $GOPATH
-          ls -lagh $GOPATH/bin
           make bootstrap
+          ls -lagh /usr/local/go_workspace/bin
+          ls -lagh /home/circleci/.go_workspace/bin
           make dev
           cd scripts
           ./gen_openapi.sh

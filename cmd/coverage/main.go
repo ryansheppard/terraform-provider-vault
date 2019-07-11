@@ -46,7 +46,7 @@ func main() {
 
 	// Go through the registries and mark the paths/endpoints they support,
 	// remarking upon notable observations along the way.
-	for _, registry := range []map[string]*vault.Description {vault.DataSourceRegistry, vault.ResourceRegistry} {
+	for _, registry := range []map[string]*vault.Description{vault.DataSourceRegistry, vault.ResourceRegistry} {
 		for _, desc := range registry {
 			for _, path := range desc.PathInventory {
 				if path == vault.GenericPath || path == vault.UnknownPath {

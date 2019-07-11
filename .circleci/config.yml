@@ -51,6 +51,7 @@ jobs:
           git clone git@github.com:hashicorp/vault.git
           cd vault
           make bootstrap
+          go get github.com/mitchellh/gox
           make dev
           cd scripts
           ./gen_openapi.sh

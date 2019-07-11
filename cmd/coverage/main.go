@@ -44,39 +44,23 @@ func main() {
 		vaultPaths[path] = false
 	}
 
-	// Go through the datasources and mark the paths/endpoints they support,
+	// Go through the registries and mark the paths/endpoints they support,
 	// remarking upon notable observations along the way.
-	for _, desc := range vault.DataSourceRegistry {
-		for _, path := range desc.PathInventory {
-			if path == vault.GenericPath || path == vault.UnknownPath {
-				continue
+	for _, registry := range []map[string]*vault.Description {vault.DataSourceRegistry, vault.ResourceRegistry} {
+		for _, desc := range registry {
+			for _, path := range desc.PathInventory {
+				if path == vault.GenericPath || path == vault.UnknownPath {
+					continue
+				}
+				seenBefore, isCurrentlyInVault := vaultPaths[path]
+				if !isCurrentlyInVault && !desc.EnterpriseOnly {
+					fmt.Println(path + " is not currently in Vault")
+				}
+				if seenBefore {
+					fmt.Println(path + " is in the Terraform Vault Provider multiple times")
+				}
+				vaultPaths[path] = true
 			}
-			seenBefore, isCurrentlyInVault := vaultPaths[path]
-			if !isCurrentlyInVault && !desc.EnterpriseOnly {
-				fmt.Println(path + " is not currently in Vault")
-			}
-			if seenBefore {
-				fmt.Println(path + " is in the Terraform Vault Provider multiple times")
-			}
-			vaultPaths[path] = true
-		}
-	}
-
-	// Go through the resources and mark the paths/endpoints they support,
-	// remarking upon notable observations along the way.
-	for _, desc := range vault.ResourceRegistry {
-		for _, path := range desc.PathInventory {
-			if path == vault.GenericPath || path == vault.UnknownPath {
-				continue
-			}
-			seenBefore, isCurrentlyInVault := vaultPaths[path]
-			if !isCurrentlyInVault && !desc.EnterpriseOnly {
-				fmt.Println(path + " is not currently in Vault")
-			}
-			if seenBefore {
-				fmt.Println(path + " is in the Terraform Vault Provider multiple times")
-			}
-			vaultPaths[path] = true
 		}
 	}
 

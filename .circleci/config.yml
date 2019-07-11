@@ -27,6 +27,7 @@ jobs:
           echo 'export TF_ACC="1"' >> $BASH_ENV
           echo 'GO111MODULE=on' >> $BASH_ENV
           echo 'export GOBIN=$GOPATH/bin' >> $BASH_ENV
+          echo 'export PATH=$PATH:$GOPATH/bin'
     - run:
         name: "Move to GOPATH"
         command: |
@@ -51,7 +52,6 @@ jobs:
           git clone git@github.com:hashicorp/vault.git
           cd vault
           make bootstrap
-          go get github.com/mitchellh/gox
           make dev
           cd scripts
           ./gen_openapi.sh

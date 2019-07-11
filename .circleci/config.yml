@@ -55,7 +55,7 @@ jobs:
           echo $PATH
           echo $GOPATH
           make bootstrap
-          ls -lagh /home/circleci/.go_workspace/bin
+          ls -lagh $GOPATH/bin
           make dev
           cd scripts
           ./gen_openapi.sh
